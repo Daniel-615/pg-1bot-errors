@@ -3,6 +3,14 @@ const service = require("../services/evaluation.service");
 const { validateEvaluationInput } = require("../utils/evaluationValidator");
 
 class EvaluationController {
+    staffOrAdmin(req) {
+        const roles = [
+            ...(Array.isArray(req.user?.rol) ? req.user.rol : req.user?.rol ? [req.user.rol] : []),
+            ...(Array.isArray(req.user?.roles) ? req.user.roles : []),
+        ].map((role) => (typeof role === "string" ? role : role?.nombre || "").trim().toLowerCase().replace(/\s+/g, ""));
+        return roles.includes("admin") || roles.includes("1botpersonal");
+    }
+
     ownUser(req, id_usuario) {
         const authenticatedUserId = req.user?.id ?? req.user?.userId ?? req.user?.id_usuario;
         return !authenticatedUserId || authenticatedUserId === id_usuario;
@@ -32,6 +40,10 @@ class EvaluationController {
         if (!validator.validateUUID(req.params.id_usuario).ok) return res.status(400).json({ ok: false, message: "El id del usuario no es válido." });
         if (!this.ownUser(req, req.params.id_usuario)) return res.status(403).json({ ok: false, message: "No puedes consultar métricas de otro usuario." });
         return res.json({ ok: true, data: await service.metrics(req.params.id_usuario) });
+    }
+    async metricsAll(req, res) {
+        if (!this.staffOrAdmin(req)) return res.status(403).json({ ok: false, message: "Solo el personal y los administradores pueden consultar métricas globales." });
+        return res.json({ ok: true, data: await service.metricsAll() });
     }
 }
 module.exports = new EvaluationController();

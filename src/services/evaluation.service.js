@@ -6,6 +6,13 @@ class EvaluationService {
     async getByUser(id_usuario) { return Evaluation.findAll({ where: { id_usuario }, order: [["createdAt", "ASC"]] }); }
     async metrics(id_usuario) {
         const rows = await this.getByUser(id_usuario);
+        return this.buildMetrics(rows);
+    }
+    async metricsAll() {
+        const rows = await Evaluation.findAll({ order: [["createdAt", "ASC"]] });
+        return this.buildMetrics(rows);
+    }
+    buildMetrics(rows) {
         const pretests = rows.filter((row) => row.momento === "pretest");
         const postests = rows.filter((row) => row.momento === "postest");
         const average = (items) => items.length ? items.reduce((sum, row) => sum + Number(row.puntuacion) / Number(row.puntuacion_maxima) * 100, 0) / items.length : null;
