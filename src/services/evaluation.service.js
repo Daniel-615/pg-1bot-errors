@@ -8,8 +8,15 @@ class EvaluationService {
         const rows = await this.getByUser(id_usuario);
         return this.buildMetrics(rows);
     }
-    async metricsAll() {
-        const rows = await Evaluation.findAll({ order: [["createdAt", "ASC"]] });
+    async metricsAll({ ageMin = null, ageMax = null } = {}) {
+        const rows = await db.sequelize.query(
+            `SELECT e.* FROM "evaluaciones" e
+             INNER JOIN "usuarios" u ON u."id" = e."id_usuario"
+             WHERE (:ageMin IS NULL OR u."edad" >= :ageMin)
+               AND (:ageMax IS NULL OR u."edad" <= :ageMax)
+             ORDER BY e."createdAt" ASC`,
+            { replacements: { ageMin, ageMax }, type: db.Sequelize.QueryTypes.SELECT }
+        );
         return this.buildMetrics(rows);
     }
     buildMetrics(rows) {
