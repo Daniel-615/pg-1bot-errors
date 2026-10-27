@@ -8,6 +8,10 @@ class EvaluationService {
         const rows = await this.getByUser(id_usuario);
         return this.buildMetrics(rows);
     }
+    async progress(id_usuario) {
+        const rows = await this.getByUser(id_usuario);
+        return { metrics: this.buildMetrics(rows), evaluations: rows };
+    }
     async metricsAll({ ageMin = null, ageMax = null } = {}) {
         const rows = await db.sequelize.query(
             `SELECT e.* FROM "evaluaciones" e

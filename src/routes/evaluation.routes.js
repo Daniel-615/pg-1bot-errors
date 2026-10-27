@@ -13,6 +13,7 @@ class EvaluationRoutes {
         this.router.use(auth);
         this.router.post("/:id_usuario", requirePermission("crear_evaluaciones"), controller.create.bind(controller));
         this.router.get("/metrics", controller.metricsAll.bind(controller));
+        this.router.get("/me/progress", controller.ownProgress.bind(controller));
         this.router.get("/:id_usuario", requirePermission("ver_evaluaciones"), controller.get.bind(controller));
         this.router.get("/:id_usuario/metrics", requirePermission("ver_metricas_evaluacion"), controller.metrics.bind(controller));
     }

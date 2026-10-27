@@ -41,6 +41,11 @@ class EvaluationController {
         if (!this.ownUser(req, req.params.id_usuario)) return res.status(403).json({ ok: false, message: "No puedes consultar métricas de otro usuario." });
         return res.json({ ok: true, data: await service.metrics(req.params.id_usuario) });
     }
+    async ownProgress(req, res) {
+        const id_usuario = req.user?.id ?? req.user?.userId ?? req.user?.id_usuario;
+        if (!id_usuario) return res.status(400).json({ ok: false, message: "No se pudo identificar al usuario." });
+        return res.json({ ok: true, data: await service.progress(id_usuario) });
+    }
     async metricsAll(req, res) {
         if (!this.staffOrAdmin(req)) return res.status(403).json({ ok: false, message: "Solo el personal y los administradores pueden consultar métricas globales." });
         const ageMin = req.query.edadMin === undefined ? null : Number(req.query.edadMin);
