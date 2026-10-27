@@ -29,7 +29,15 @@ class EvaluationService {
         const average = (items) => items.length ? items.reduce((sum, row) => sum + Number(row.puntuacion) / Number(row.puntuacion_maxima) * 100, 0) / items.length : null;
         const inicial = average(pretests);
         const final = average(postests);
-        return { inicial, final, mejoraPorcentual: inicial !== null && inicial !== 0 && final !== null ? ((final - inicial) / inicial) * 100 : null, muestraPretest: pretests.length, muestraPostest: postests.length };
+        return {
+            inicial,
+            final,
+            mejoraPorcentual: inicial !== null && inicial !== 0 && final !== null ? ((final - inicial) / inicial) * 100 : null,
+            muestraPretest: pretests.length,
+            muestraPostest: postests.length,
+            fechaInicial: pretests[0]?.createdAt ?? null,
+            fechaFinal: postests[postests.length - 1]?.createdAt ?? null,
+        };
     }
 }
 module.exports = new EvaluationService();
